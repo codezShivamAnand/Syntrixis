@@ -2,11 +2,7 @@ const validateUserData = require('../utils/validator');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const userAuthMiddleware = require("../middleware/Authmiddleware");
-<<<<<<< HEAD
 const redisClient = require('../config/redis');
-=======
->>>>>>> 6f23fe14865678543c9b816bf585c7ecb6f38396
 
 const register = async(req,res)=>{
     try{// API Validation
@@ -59,7 +55,7 @@ const getProfile = async (req,res)=>{
     }
 }
 
-<<<<<<< HEAD
+
 const logout = async(req,res)=>{
     const {token} = req.cookies;
     // adding token to redis blockedList
@@ -73,6 +69,3 @@ const logout = async(req,res)=>{
 }
 
 module.exports = {register, login, getProfile, logout};
-=======
-module.exports = {register, login, getProfile};
->>>>>>> 6f23fe14865678543c9b816bf585c7ecb6f38396
