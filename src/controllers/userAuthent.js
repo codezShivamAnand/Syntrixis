@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const userAuthMiddleware = require("../middleware/Authmiddleware");
+const redisClient = require('../config/redis');
 
 const register = async(req,res)=>{
     try{// API Validation
@@ -55,4 +56,16 @@ const getProfile = async (req,res)=>{
     }
 }
 
-module.exports = {register, login, getProfile};
+const logout = async(req,res)=>{
+    const {token} = req.cookies;
+    // adding token to redis blockedList
+    await redisClient.set(`token:${token}`, "Blocked");
+    const payload = jwt.decode(token);
+    // console.log(payload);
+    await redisClient.expireAt(`token:${token}`, payload.exp);
+
+    res.cookie("token", null, {expires: new Date(Date.now())});
+    res.send("Logged Out Successfully");
+}
+
+module.exports = {register, login, getProfile, logout};
