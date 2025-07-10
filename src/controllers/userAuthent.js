@@ -10,10 +10,11 @@ const register = async(req,res)=>{
         const {firstName, emailId, password} = req.body;
         // hash the password before stroing it in db 
         req.body.password =await bcrypt.hash(password, 10);
+        req.body.role = 'user'; // hardcoded to fix the role for user as user always, for admis create a different route 
 
         const user = await User.create(req.body); // registered 
         // token generate 
-        const token = jwt.sign({_id:user.id, emailId:emailId},process.env.JWT_KEY, {expiresIn: 60*60});
+        const token = jwt.sign({_id:user.id, emailId:emailId, role: user.role},process.env.JWT_KEY, {expiresIn: 60*60});
         res.cookie('token', token, {maxAge: 60*60*1000});
         res.status(201).send("user registered successfully");
     }
@@ -35,7 +36,7 @@ const login = async(req,res)=>{
         if(!match)
             throw new Error("Invalid Credentials");
 
-        const token =  jwt.sign({_id:user._id , emailId:emailId},process.env.JWT_KEY,{expiresIn: 60*60});
+        const token =  jwt.sign({_id:user._id , emailId:emailId, role: user.role},process.env.JWT_KEY,{expiresIn: 60*60});
         res.cookie('token',token,{maxAge: 60*60*1000}); // 1hr expiry time set, could also use new date method 
         res.status(200).send("Logged In Succeessfully");
     }
@@ -55,7 +56,6 @@ const getProfile = async (req,res)=>{
     }
 }
 
-
 const logout = async(req,res)=>{
     const {token} = req.cookies;
     // adding token to redis blockedList
@@ -68,4 +68,23 @@ const logout = async(req,res)=>{
     res.send("Logged Out Successfully");
 }
 
-module.exports = {register, login, getProfile, logout};
+const adminRegister = async(req,res)=>{
+    try{// API Validation
+        validateUserData(req.body);
+        const {firstName, emailId, password} = req.body;
+        // hash the password before stroing it in db 
+        req.body.password =await bcrypt.hash(password, 10);
+        // req.body.role = 'admin'; // dont hardcore it , so that admin can register any new user as admin or user role
+
+        const user = await User.create(req.body); // registered 
+        // token generate 
+        const token = jwt.sign({_id:user.id, emailId:emailId, role: user.role},process.env.JWT_KEY, {expiresIn: 60*60});
+        res.cookie('token', token, {maxAge: 60*60*1000});
+        res.status(201).send("user registered successfully");
+    }
+    catch(err){
+        res.status(400).send("Error: "+err.message);
+    }
+}
+
+module.exports = {register, login, getProfile, logout, adminRegister};
