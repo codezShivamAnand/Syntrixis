@@ -3,7 +3,6 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const redisClient = require('../config/redis');
 
-
 const adminMiddleware = async(req,res,next)=>{
     const {token} = req.cookies;
     // token check ---> 

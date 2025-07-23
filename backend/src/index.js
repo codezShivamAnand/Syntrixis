@@ -4,13 +4,18 @@ require('dotenv').config();
 const main = require("./config/db");
 const User = require("./models/user");
 const jwt = require('jsonwebtoken');
-const cookieParser = require('cookie-parser')
+const cookieParser = require('cookie-parser');
 const authRouter = require('./routes/userAuth');
 const redisClient = require('./config/redis');
+const problemRouter = require("./routes/problemRouting");
 
+// parser
 app.use(express.json());
 app.use(cookieParser());
+
+// mount routes
 app.use('/auth', authRouter);
+app.use('/problem', problemRouter);
 
 const initaliseConnection = async (req,res)=>{
     try{

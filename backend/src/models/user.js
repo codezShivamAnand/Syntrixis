@@ -40,5 +40,5 @@ const userSchema = new Schema({
     }
 },{timestamps: true});
 
-const User = mongoose.model("user", userSchema);
+const User = mongoose.model("user", userSchema); // binds schema(userSchema) to the collection name(user)
 module.exports = User;

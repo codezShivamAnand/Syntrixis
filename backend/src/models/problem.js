@@ -48,6 +48,7 @@ const problemSchema = new Schema({
             }
         }
     ], 
+    
     startCode:[ // boilerplate code 
         {
             language:{
@@ -60,11 +61,24 @@ const problemSchema = new Schema({
             }
         }
     ], 
+
+    referenceSolution:[ // this will be used to check if the user gives its own test case, then that input can be run on this refernceSolution and check if the output is same as expected output    
+        {
+            language:{
+                type:String,
+                required:true,
+            },
+            completeCode:{
+                type:String,
+                required:true
+            }
+        }
+    ],
     problemCreator:{
         type: Schema.Types.ObjectId,
         ref:'user',
         required:true
     }
-});
+}, {timestamps: true});
 const Problem = mongoose.model('problem', problemSchema);
 module.exports = Problem;

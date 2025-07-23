@@ -1,6 +1,6 @@
 const validator = require('validator');
 
-async function validator(data){
+async function validateUserData(data){
 
     const mandatoryField = ['firstName', 'emailId', 'password'];
     const isAllowed = mandatoryField.every((k)=>Object.keys(data).includes(k));
@@ -8,7 +8,7 @@ async function validator(data){
     if(!isAllowed)
         throw new Error("Field missing");
     // firstName validate karo
-    if(data.firstName.length < 3 && data.firstName.length > 20)
+    if(!(data.firstName.length >= 3 && data.firstName.length <= 20))
         throw new Error("Enter valid FirstName");
     // email Validate
     if(!validator.isEmail(data.emailId))
@@ -17,5 +17,4 @@ async function validator(data){
     if(!validator.isStrongPassword(data.password))
         throw new Error("Weak Password");
 }
-
-module.exports = validator;
+module.exports = validateUserData;

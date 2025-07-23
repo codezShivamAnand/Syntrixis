@@ -10,7 +10,7 @@ const register = async(req,res)=>{
         const {firstName, emailId, password} = req.body;
         // hash the password before stroing it in db 
         req.body.password =await bcrypt.hash(password, 10);
-        req.body.role = 'user'; // hardcoded to fix the role for user as user always, for admis create a different route 
+        req.body.role = 'user'; // hardcoded to fix the role for user as user always, for admins create a different route 
 
         const user = await User.create(req.body); // registered 
         // token generate 
