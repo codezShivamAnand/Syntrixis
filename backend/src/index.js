@@ -19,6 +19,9 @@ app.use('/problem', problemRouter);
 
 const initaliseConnection = async (req,res)=>{
     try{
+// Promise.all([...]) takes an array of Promises and returns a single Promise that:
+    // Resolves when all Promises inside it resolve
+    // Resolves to an array of their resolved values
 
         await Promise.all([main(), redisClient.connect() ]);
         console.log("DB connected");

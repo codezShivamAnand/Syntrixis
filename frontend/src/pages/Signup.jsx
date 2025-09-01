@@ -11,6 +11,7 @@ const signupSchema = z.object({
 function Signup() {
   const {
     register,
+    
     handleSubmit,
     formState: { errors },
   } = useForm({ resolver: zodResolver(signupSchema) });
