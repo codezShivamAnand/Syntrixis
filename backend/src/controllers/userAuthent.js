@@ -16,10 +16,26 @@ const register = async(req,res)=>{
         // token generate 
         const token = jwt.sign({_id:user.id, emailId:emailId, role: user.role},process.env.JWT_KEY, {expiresIn: 60*60});
         res.cookie('token', token, {maxAge: 60*60*1000});
-        res.status(201).send("user registered successfully");
+        // res.status(201).send("user registered successfully");
+
+        const reply = {
+            firstName: user.firstName,
+            emailId: user.emailId,
+            _id: user._id,
+        }
+        res.status(201).json({
+            success: true,
+            message: "User registered Successfully",
+            user: reply 
+        });
+
     }
     catch(err){
-        res.status(400).send("Error: "+err);
+        console.log("registerError: ", err.message);
+        res.status(400).json({
+            success:false,
+            message:"Failed to register"
+        });
     }
 }
 
@@ -36,12 +52,27 @@ const login = async(req,res)=>{
         if(!match)
             throw new Error("Invalid Credentials");
 
+        const reply = {
+            firstName: user.firstName,
+            emailId: user.emailId,
+            _id: user._id,
+        }
+
         const token =  jwt.sign({_id:user._id , emailId:emailId, role: user.role},process.env.JWT_KEY,{expiresIn: 60*60});
         res.cookie('token',token,{maxAge: 60*60*1000}); // 1hr expiry time set, could also use new date method 
-        res.status(200).send("Logged In Succeessfully");
+        
+        // res.status(200).send("Logged In Succeessfully");
+        res.status(201).json({
+            success: true,
+            message: "Logged In Succeessfully",
+            user: reply 
+        });
     }
     catch(err){
-        res.status(401).send("Error: "+err.message);
+        res.status(401).res.status(400).json({
+            success:false,
+            message:"Failed to register"
+        });
     }
 }
 
@@ -65,7 +96,10 @@ const logout = async(req,res)=>{
     await redisClient.expireAt(`token:${token}`, payload.exp);
 
     res.cookie("token", null, {expires: new Date(Date.now())});
-    res.send("Logged Out Successfully");
+    res.status(201).json({
+        success: true,
+        message: "Logged out Successfully"
+    });
 }
 
 const adminRegister = async(req,res)=>{
