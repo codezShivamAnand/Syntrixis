@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 require('dotenv').config();
+const cors = require('cors');
 const main = require("./config/db");
 const User = require("./models/user");
 const jwt = require('jsonwebtoken');
@@ -12,12 +13,12 @@ const problemRouter = require("./routes/problemRouting");
 // parser
 app.use(express.json());
 app.use(cookieParser());
-app.cors({
+app.use(cors({
     origin: 'http://localhost:5173',
     credentials: true 
-})
+}))
 // mount routes
-app.use('/auth', authRouter);
+app.use('/user', authRouter);
 app.use('/problem', problemRouter);
 
 const initaliseConnection = async (req,res)=>{

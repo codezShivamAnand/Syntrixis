@@ -1,7 +1,6 @@
 const express = require('express');
 const problemRouter = express.Router();
 const adminMiddleware = require("../middleware/adminMiddleware");
-const createProblem = require('../controllers/userProblem');
 const userAuthMiddleware = require("../middleware/usermiddleware");
 const {createProblem, updateProblem, deleteProblem, getProblemById, getAllProblem} = require("../controllers/userProblem");
 //admin

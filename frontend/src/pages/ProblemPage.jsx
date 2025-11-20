@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
-import axiosClient from "../utils/axiosClient";
+import {axiosClient} from "../utils/axiosClient";
 import { useParams } from "react-router";
 
 const ProblemPage = () => {

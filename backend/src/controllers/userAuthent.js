@@ -15,7 +15,12 @@ const register = async(req,res)=>{
         const user = await User.create(req.body); // registered 
         // token generate 
         const token = jwt.sign({_id:user.id, emailId:emailId, role: user.role},process.env.JWT_KEY, {expiresIn: 60*60});
-        res.cookie('token', token, {maxAge: 60*60*1000});
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: false,      // only false for localhost
+            sameSite: "None",    
+            maxAge: 60 * 60 * 1000
+        });
         // res.status(201).send("user registered successfully");
 
         const reply = {
@@ -23,6 +28,7 @@ const register = async(req,res)=>{
             emailId: user.emailId,
             _id: user._id,
         }
+        console.log(reply);
         res.status(201).json({
             success: true,
             message: "User registered Successfully",
@@ -39,42 +45,100 @@ const register = async(req,res)=>{
     }
 }
 
-const login = async(req,res)=>{
-    try{
+// const login = async(req,res)=>{
+//     try{
 
-        const {emailId, password} = req.body;
-        if(!emailId)
-            throw new Error("Invalid Credentials");
-        if(!password)
-            throw new Error("Invalid Credentials");
-        const user = await User.findOne({emailId}); //findOne returns a promise, so user is a Promise 
-        const match = await bcrypt.compare(password, user.password ); // so put await too here 
-        if(!match)
-            throw new Error("Invalid Credentials");
+//         const {emailId, password} = req.body;
+//         if(!emailId)
+//             throw new Error("Invalid Credentials");
+//         if(!password)
+//             throw new Error("Invalid Credentials");
+//         const user = await User.findOne({emailId}); //findOne returns a promise, so user is a Promise 
+//         const match = await bcrypt.compare(password, user.password ); // so put await too here 
+//         if(!match)
+//             throw new Error("Invalid Credentials");
 
-        const reply = {
-            firstName: user.firstName,
-            emailId: user.emailId,
-            _id: user._id,
-        }
+//         const reply = {
+//             firstName: user.firstName,
+//             emailId: user.emailId,
+//             _id: user._id,
+//         }
 
-        const token =  jwt.sign({_id:user._id , emailId:emailId, role: user.role},process.env.JWT_KEY,{expiresIn: 60*60});
-        res.cookie('token',token,{maxAge: 60*60*1000}); // 1hr expiry time set, could also use new date method 
-        
-        // res.status(200).send("Logged In Succeessfully");
-        res.status(201).json({
-            success: true,
-            message: "Logged In Succeessfully",
-            user: reply 
-        });
+//         const token =  jwt.sign({_id:user._id , emailId:emailId, role: user.role},process.env.JWT_KEY,{expiresIn: "1h"});
+//         // res.cookie('token',token,{maxAge: 60*60*1000}); // 1hr expiry time set, could also use new date method 
+//         res.cookie("token", token, {
+//             httpOnly: true,
+//             secure: false,
+//             sameSite: "Lax",
+//             maxAge: 60 * 60 * 1000,
+//         });
+//         // res.status(200).send("Logged In Succeessfully");
+//         res.status(201).json({
+//             success: true,
+//             message: "Logged In Succeessfully",
+//             user: reply 
+//         });
+//     }
+//     catch(err){
+//         res.status(400).json({
+//             success:false,
+//             message:"Failed to register"
+//         });
+//     }
+// }
+
+const login = async (req, res) => {
+  try {
+    const { emailId, password } = req.body;
+
+    if (!emailId || !password) {
+      return res.status(400).json({ success: false, message: "Invalid credentials" });
     }
-    catch(err){
-        res.status(401).res.status(400).json({
-            success:false,
-            message:"Failed to register"
-        });
+
+    const user = await User.findOne({ emailId });
+    if (!user) {
+      return res.status(400).json({ success: false, message: "Invalid credentials" });
     }
-}
+
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) {
+      return res.status(400).json({ success: false, message: "Invalid credentials" });
+    }
+
+    const token = jwt.sign(
+      { _id: user._id, emailId: user.emailId, role: user.role },
+      process.env.JWT_KEY,
+      { expiresIn: "1h" }
+    );
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: false,      // only false for localhost
+      sameSite: "None",    
+      maxAge: 60 * 60 * 1000
+    });
+
+    const reply = {
+      firstName: user.firstName,
+      emailId: user.emailId,
+      _id: user._id,
+    };
+
+    return res.status(200).json({
+      success: true,
+      message: "Logged In Successfully",
+      user: reply,
+    });
+
+  } catch (err) {
+    console.error("Login error:", err);
+    return res.status(400).json({
+      success: false,
+      message: "Failed to login",
+    });
+  }
+};
+
 
 const getProfile = async (req,res)=>{
     // we not gonna ask user for (emailId or _id ) , current user's profile -> display 
