@@ -17,16 +17,16 @@ function App() {
         dispatch(checkAuth());
     }, [dispatch]);
 
-    // if (loading) {
-    //   return <div className="min-h-screen flex items-center justify-center">
-    //     <span className="loading loading-spinner loading-lg"></span>
-    //   </div>;
-    // }
+    if (loading) {
+      return <div className="min-h-screen flex items-center justify-center">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>;
+    }
 
   return (
     <>
      <Routes>
-        <Route path="/" element={<Homepage></Homepage>}></Route>
+        <Route path="/" element={isAuthenticated ?<Homepage></Homepage>:<Navigate to="/login" />}></Route>
         <Route path="/login" element={isAuthenticated ? <Navigate to= '/'/> : <Login></Login>}></Route>
         <Route path="/signup" element={ isAuthenticated ? <Navigate to= '/'/> : <Signup></Signup>}></Route>
         <Route path="/admin" element={<AdminPanel/>}></Route>
@@ -38,7 +38,7 @@ function App() {
             <Navigate to="/" />
         } 
       /> */}
-        <Route path="/problem/:problemId" element={<ProblemPage/>}></Route>
+      <Route path="/problem/:problemId" element={<ProblemPage/>}></Route>
       <Route path="/editor" element={<MonacoEditor/>} />
      </Routes>
     </>
