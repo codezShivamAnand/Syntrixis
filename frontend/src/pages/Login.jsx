@@ -27,7 +27,7 @@ function Login() {
     if (isAuthenticated) {
       navigate('/');
     }
-  }, []);
+  }, [isAuthenticated, navigate]);
 
   const onSubmit = (data) => {
     console.log("logindata", data);

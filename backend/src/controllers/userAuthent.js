@@ -5,23 +5,21 @@ const User = require('../models/user');
 const redisClient = require('../config/redis');
 
 const register = async(req,res)=>{
-    try{// API Validation
+    try{
+        // API Validation
         validateUserData(req.body);
         const {firstName, emailId, password} = req.body;
         // hash the password before stroing it in db 
         req.body.password =await bcrypt.hash(password, 10);
-        req.body.role = 'user'; // hardcoded to fix the role for user as user always, for admins create a different route 
+        req.body.role = 'user'; // hardcoded to fix the role for user as user always, for admins create a different route altogether 
 
         const user = await User.create(req.body); // registered 
-        // token generate 
         const token = jwt.sign({_id:user.id, emailId:emailId, role: user.role},process.env.JWT_KEY, {expiresIn: 60*60});
         res.cookie('token', token, {
             httpOnly: true,
-            secure: false,      // only false for localhost
-            sameSite: "None",    
+            secure: false,         
             maxAge: 60 * 60 * 1000
         });
-        // res.status(201).send("user registered successfully");
 
         const reply = {
             firstName: user.firstName,
@@ -113,8 +111,8 @@ const login = async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false,      // only false for localhost
-      sameSite: "None",    
+      secure: false,      
+      path: "/",   
       maxAge: 60 * 60 * 1000
     });
 
