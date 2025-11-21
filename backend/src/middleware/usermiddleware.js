@@ -4,30 +4,6 @@ require('dotenv').config();
 const redisClient = require('../config/redis');
 
 
-// const userAuthMiddleware = async(req,res,next)=>{
-//     const {token} = req.cookies;
-//     // token check ---> 
-//     if(!token)
-//         throw new Error("Invalid token");
-//     const payload = jwt.verify(token, process.env.JWT_KEY );
-//     // console.log(payload);
-//     const {_id} = payload;
-//     if(!_id)
-//         throw new Error ("invalid User");
-//     // find document(profile)
-//     const userProfile = await User.findById(_id);
-//     if(!userProfile){
-//         throw new Error ("invalid User");
-//     }
-//     // check if the token is present in redis blocked list
-//     const isBlocked =  await redisClient.exists(`token: ${token}`);// returns true or false
-//     if(isBlocked)
-//         throw new Error("Invalid Token");
-
-//     req.userProfile = userProfile; // can be used in getProfile 
-//     next();
-// }
-
 const userAuthMiddleware = async (req, res, next) => {
   try {
     const { token } = req.cookies;
@@ -40,6 +16,8 @@ const userAuthMiddleware = async (req, res, next) => {
     }
 
     const payload = jwt.verify(token, process.env.JWT_KEY);
+    // console.log("userMiddleware: payload", payload);
+
     if (!payload?._id) {
       return res.status(401).json({
         success: false,
@@ -55,8 +33,8 @@ const userAuthMiddleware = async (req, res, next) => {
       });
     }
 
-    // FIXED REDIS KEY — remove the space
-    const isBlocked = await redisClient.exists(`token:${token}`);
+// to be checked ... why redis is disconnecting yaar 
+    const isBlocked = await redisClient.exists(`token:${token}`); // ** no space: token:${token}
     if (isBlocked) {
       return res.status(401).json({
         success: false,
