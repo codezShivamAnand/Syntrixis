@@ -2,16 +2,17 @@ import {Routes, Route, Navigate} from "react-router";
 import Login from "./pages/Login";
 import Homepage from "./pages/Homepage";
 import Signup from "./pages/Signup";
-import AdminPanel from "./pages/AdminPanel";
+import AdminPanel from "./components/AdminPanel.jsx";
+import AdminDelete from "./components/AdminDelete";
+import Admin from "./pages/Admin";
 import {useSelector, useDispatch} from 'react-redux';
 import {useEffect} from 'react';
 import {checkAuth} from './authSlice.js';
-import MonacoEditor from "./pages/monacoEditor";
 import ProblemPage from "./pages/ProblemPage";
 
 function App() {
     const dispatch = useDispatch();
-    const {isAuthenticated, loading} = useSelector((state)=>state.auth);
+    const {isAuthenticated, loading, user} = useSelector((state)=>state.auth);
 
     useEffect(()=>{
         dispatch(checkAuth());
@@ -29,17 +30,10 @@ function App() {
         <Route path="/" element={isAuthenticated ?<Homepage></Homepage>:<Navigate to="/login" />}></Route>
         <Route path="/login" element={isAuthenticated ? <Navigate to= '/'/> : <Login></Login>}></Route>
         <Route path="/signup" element={ isAuthenticated ? <Navigate to= '/'/> : <Signup></Signup>}></Route>
-        <Route path="/admin" element={<AdminPanel/>}></Route>
-      {/* <Route 
-        path="/admin" 
-        element={
-          isAuthenticated && user?.role === 'admin' ? 
-            <AdminPanel /> : 
-            <Navigate to="/" />
-        } 
-      /> */}
-      <Route path="/problem/:problemId" element={<ProblemPage/>}></Route>
-      <Route path="/editor" element={<MonacoEditor/>} />
+        <Route path="/admin" element={isAuthenticated && user?.role === 'admin' ? <Admin /> : <Navigate to="/" />} />
+        <Route path="/admin/create" element={isAuthenticated && user?.role === 'admin' ? <AdminPanel /> : <Navigate to="/" />} />
+        <Route path="/admin/delete" element={isAuthenticated && user?.role === 'admin' ? <AdminDelete /> : <Navigate to="/" />} />
+        <Route path="/problem/:problemId" element={<ProblemPage/>}></Route>
      </Routes>
     </>
   )
